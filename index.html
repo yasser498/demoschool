@@ -1,0 +1,57 @@
+<!doctype html><html lang="ar" dir="rtl"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>جِسر | التواصل المدرسي</title><link rel="stylesheet" href="/assets/app.css?v=.9">
+</head><body>
+<div id="login" class="login"><div class="loginbox">
+<section class="loginbrand"><img src="/assets/moe-logo.png"><h1>جِسر</h1><p>المدرسة والأسرة أقرب. تجربة تواصل متكاملة بين ولي الأمر والطالب والمدرسة.</p></section>
+<section class="loginpanel"><h2>اختر بوابة الدخول</h2><p>استخدم أحد الحسابات التجريبية الجاهزة.</p>
+<div class="roles"><button class="role active" data-role="parent"><b>ولي الأمر</b><small>متابعة الأبناء والطلبات</small></button><button class="role" data-role="student"><b>الطالب</b><small>الجدول والتنبيهات</small></button><button class="role" data-role="admin"><b>المدرسة</b><small>إدارة التواصل</small></button></div>
+<form id="loginForm"><div class="field"><label>رمز الدخول</label><input id="code" required value="P1001"></div><div id="loginMsg" class="alert hidden"></div><button class="btn primary" style="width:100%;margin-top:14px">دخول جِسر</button></form>
+<div class="demo">ولي الأمر: <b>P1001</b> · الطالب: <b>S1001</b> · المدرسة: <b>ADMIN1448</b></div></section>
+</div></div>
+
+<div class="shell">
+<aside class="side"><div class="brand"><img src="/assets/moe-logo.png"><div><b id="schoolName">المدرسة</b><small>منصة جِسر · 1448هـ</small></div></div><div class="who"><b id="whoName">—</b><span id="whoRole">—</span></div><nav id="nav" class="nav"></nav><button id="logout" class="logout">تسجيل الخروج</button></aside>
+<main class="main"><header class="top"><div class="topin"><h2 id="pageTitle">الرئيسية</h2><div class="pill">إشعارات غير مقروءة: <b id="unread">0</b></div></div></header>
+<div class="content"><div id="globalMsg" class="alert hidden"></div>
+
+<section id="parentHome" class="view">
+<div class="head"><div><span class="tag">بوابة ولي الأمر</span><h1 id="parentHello">مرحبًا</h1><p>كل ما يخص أبناءك وطلباتك في مكان واحد.</p></div><button class="btn primary" data-new="استئذان">+ طلب جديد</button></div>
+<div id="parentKpis" class="kpis"></div>
+<div class="card"><div class="cardhead"><h3>أبنائي</h3></div><div class="cardbody"><div id="children" class="grid2"></div></div></div>
+<div class="card"><div class="cardhead"><h3>الخدمات السريعة</h3></div><div class="cardbody"><div class="quick"><button class="q" data-new="استئذان"><b>استئذان</b><small>خروج مبكر</small></button><button class="q" data-new="عذر غياب"><b>عذر غياب</b><small>توثيق الغياب</small></button><button class="q" data-new="موعد"><b>حجز موعد</b><small>مع الإدارة أو المرشد</small></button><button class="q" data-new="استفسار"><b>تواصل</b><small>استفسار مرتبط بالطالب</small></button></div></div></div>
+<div class="grid2"><div class="card"><div class="cardhead"><h3>صندوق ابني</h3></div><div class="cardbody" id="parentTimeline"></div></div><div class="card"><div class="cardhead"><h3>آخر الإشعارات</h3></div><div class="cardbody" id="parentNotif"></div></div></div>
+</section>
+
+<section id="parentRequests" class="view"><div class="head"><div><span class="tag">ولي الأمر</span><h1>طلباتي</h1><p>تابع الاستئذانات والأعذار والمواعيد.</p></div><button class="btn primary" data-new="استئذان">+ طلب جديد</button></div>
+<div class="card"><div class="tablewrap"><table class="table"><thead><tr><th>الطلب</th><th>الطالب</th><th>النوع</th><th>التفاصيل</th><th>الحالة</th><th>رد المدرسة</th><th>محادثة</th></tr></thead><tbody id="parentReqTable"></tbody></table></div></div></section>
+
+<section id="parentNotifications" class="view"><div class="head"><div><span class="tag">ولي الأمر</span><h1>الإشعارات</h1></div></div><div class="card"><div class="cardbody" id="parentNotifAll"></div></div></section>
+
+<section id="studentHome" class="view"><div class="studenthero"><h1 id="studentName">مرحبًا</h1><p id="studentMeta">—</p><div class="chips"><div class="chip">الحضور<b id="stPresent">حاضر</b></div><div class="chip">الحصص<b id="stLessons">7</b></div><div class="chip">الإشادات<b id="stPraise">0</b></div><div class="chip">تنبيهات<b id="stAlerts">0</b></div></div></div>
+<div class="grid2" style="margin-top:14px"><div class="card"><div class="cardhead"><h3>جدولي اليوم</h3></div><div class="cardbody" id="schedule"></div></div><div class="card"><div class="cardhead"><h3>نبض اليوم</h3></div><div class="cardbody" id="pulse"></div></div></div>
+<div class="card"><div class="cardhead"><h3>رسائل المدرسة</h3></div><div class="cardbody" id="studentNotif"></div></div></section>
+
+<section id="studentNotifications" class="view"><div class="head"><div><span class="tag">الطالب</span><h1>الإشعارات</h1></div></div><div class="card"><div class="cardbody" id="studentNotifAll"></div></div></section>
+
+<section id="adminHome" class="view"><div class="head"><div><span class="tag">بوابة المدرسة</span><h1>صندوق التواصل المدرسي</h1><p>كل طلبات أولياء الأمور في مكان واحد.</p></div><button class="btn primary" id="newAnn">+ إشعار جديد</button></div>
+<div id="adminKpis" class="kpis"></div><div class="grid2"><div class="card"><div class="cardhead"><h3>طلبات تحتاج إجراء</h3></div><div class="tablewrap"><table class="table" style="min-width:620px"><thead><tr><th>الطالب</th><th>النوع</th><th>ولي الأمر</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="adminPreview"></tbody></table></div></div><div class="card"><div class="cardhead"><h3>مؤشرات التواصل</h3></div><div class="cardbody" id="adminSummary"></div></div></div>
+<div class="card"><div class="cardhead"><h3>آخر النشاط</h3></div><div class="cardbody" id="adminTimeline"></div></div></section>
+
+<section id="adminRequests" class="view"><div class="head"><div><span class="tag">الإدارة</span><h1>إدارة الطلبات</h1></div><select id="reqFilter" class="control" style="width:auto"><option>الكل</option><option>قيد المراجعة</option><option>مقبول</option><option>مرفوض</option></select></div>
+<div class="card"><div class="tablewrap"><table class="table"><thead><tr><th>الطلب</th><th>الطالب</th><th>ولي الأمر</th><th>النوع</th><th>التفاصيل</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="adminReqTable"></tbody></table></div></div></section>
+
+<section id="adminNotifications" class="view"><div class="head"><div><span class="tag">الإدارة</span><h1>الإشعارات والتعاميم</h1></div><button class="btn primary" id="newAnn2">+ إشعار</button></div>
+<div class="card"><div class="tablewrap"><table class="table"><thead><tr><th>العنوان</th><th>الفئة</th><th>المستهدف</th><th>تأكيد</th><th>الاطلاع</th><th>التاريخ</th></tr></thead><tbody id="annTable"></tbody></table></div></div></section>
+
+<section id="adminStudents" class="view"><div class="head"><div><span class="tag">الإدارة</span><h1>ملف الطالب الموحد</h1></div></div>
+<div class="card"><div class="tablewrap"><table class="table"><thead><tr><th>الطالب</th><th>الصف/الفصل</th><th>ولي الأمر</th><th>الحضور</th><th>التأخر</th><th>الإشادات</th><th>طلبات الأسرة</th></tr></thead><tbody id="studentsTable"></tbody></table></div></div></section>
+
+<section id="adminReport" class="view"><div class="head no-print"><div><span class="tag">الإدارة</span><h1>تقرير التواصل المدرسي</h1></div><button id="printBtn" class="btn primary">طباعة / حفظ PDF</button></div>
+<article class="report"><div class="reporthead"><img src="/assets/moe-logo.png"><div class="reporttitle"><h2>مدرسة عماد الدين زنكي المتوسطة</h2><p>تقرير منصة جِسر للتواصل المدرسي</p><b id="reportDate">—</b></div><div class="reportmeta">إعداد<br><b id="reportBy">—</b></div></div><div class="section"><h3>الملخص</h3><div id="reportStats" class="reportstats"></div></div><div class="section"><h3>الطلبات</h3><div class="tablewrap"><table class="table"><thead><tr><th>الطلب</th><th>الطالب</th><th>النوع</th><th>ولي الأمر</th><th>الحالة</th><th>القرار</th></tr></thead><tbody id="reportReq"></tbody></table></div></div></article></section>
+
+</div></main></div>
+
+<div id="modal" class="modal hidden"><div class="modalbox"><div class="modalhead"><h3 id="modalTitle">—</h3><button id="modalClose" class="btn soft">×</button></div><div id="modalBody" class="modalbody"></div><div id="modalFoot" class="modalfoot"></div></div></div>
+<script src="/assets/config.js?v=.9"></script><script src="/assets/app.js?v=.9"></script>
+</body></html>
