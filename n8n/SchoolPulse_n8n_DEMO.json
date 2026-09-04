@@ -1,0 +1,187 @@
+{
+  "name": "SchoolPulse - غرفة العمليات المدرسية - DEMO مستقل",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "schoolpulse-api-v1",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "3ff589fb-7e62-4bea-877e-92bec50f822d",
+      "name": "Webhook - SchoolPulse API",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        560,
+        400
+      ],
+      "webhookId": "351d780b-2614-4501-8f04-3b902224d0e8"
+    },
+    {
+      "parameters": {
+        "httpMethod": "OPTIONS",
+        "path": "schoolpulse-api-v1",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "9ad61acf-0909-425a-9540-62649fb223bf",
+      "name": "Webhook - CORS",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        560,
+        650
+      ],
+      "webhookId": "973cb005-739a-4b98-84a8-228364d45e32"
+    },
+    {
+      "parameters": {
+        "respondWith": "noData",
+        "options": {
+          "responseCode": 204,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, X-SchoolPulse-Key"
+              },
+              {
+                "name": "Access-Control-Max-Age",
+                "value": "86400"
+              }
+            ]
+          }
+        }
+      },
+      "id": "9cb3e133-b83c-4ea2-b74f-9c66c64ab831",
+      "name": "رد CORS",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        820,
+        650
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $json.body ?? {};\nconst headers = $json.headers ?? {};\nconst action = String(body.action ?? '').trim();\nconst key = String(headers['x-schoolpulse-key'] ?? headers['X-SchoolPulse-Key'] ?? body.key ?? '').trim();\n\nconst API_KEY = 'SCHOOLPULSE-DEMO-1448';\nconst store = $getWorkflowStaticData('global');\n\nconst pad = n => String(n).padStart(2,'0');\nfunction riyadhNow(){\n  const d = new Date(Date.now()+3*60*60*1000);\n  return {\n    date:`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())}`,\n    time:`${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`,\n    stamp:`${d.getUTCFullYear()}${pad(d.getUTCMonth()+1)}${pad(d.getUTCDate())}${pad(d.getUTCHours())}${pad(d.getUTCMinutes())}${pad(d.getUTCSeconds())}`,\n    iso:`${d.getUTCFullYear()}-${pad(d.getUTCMonth()+1)}-${pad(d.getUTCDate())} ${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`\n  };\n}\nconst now = riyadhNow();\nfunction addHours(dateTime,h){\n  const d = new Date(dateTime.replace(' ','T')+'+03:00');\n  const x = new Date(d.getTime()+h*3600000);\n  const y = new Date(x.getTime()+3*3600000);\n  return `${y.getUTCFullYear()}-${pad(y.getUTCMonth()+1)}-${pad(y.getUTCDate())} ${pad(y.getUTCHours())}:${pad(y.getUTCMinutes())}`;\n}\nfunction gen(prefix){return `${prefix}-${now.stamp}-${Math.random().toString(36).slice(2,5).toUpperCase()}`;}\nfunction event(type,ref,description,user='النظام'){\n  store.events.unshift({id:gen('EV'),at:riyadhNow().iso,type,ref,description,user});\n  store.events = store.events.slice(0,100);\n}\nfunction seed(){\n  const n=riyadhNow();\n  store.version=1;\n  store.incidents=[\n    {id:'INC-DEMO-001',createdAt:`${n.date} 07:12`,title:'تسرب مياه قرب دورات المياه',description:'تجمع مياه يحتاج معالجة عاجلة.',category:'مرافق',priority:'عاجل',location:'الدور الأول',reportedBy:'الإدارة',assignee:'فريق الصيانة',status:'قيد المعالجة',slaHours:4,dueAt:`${n.date} 11:12`,closedAt:'',closeNote:''},\n    {id:'INC-DEMO-002',createdAt:`${n.date} 07:35`,title:'جهاز عرض لا يعمل',description:'تعطل جهاز العرض داخل أحد الفصول.',category:'تقنية',priority:'متوسط',location:'فصل 2/3',reportedBy:'معلم',assignee:'الدعم التقني',status:'مفتوح',slaHours:12,dueAt:`${n.date} 19:35`,closedAt:'',closeNote:''},\n    {id:'INC-DEMO-003',createdAt:`${n.date} 08:05`,title:'مقبض باب مكسور',description:'يحتاج استبدال.',category:'صيانة',priority:'منخفض',location:'فصل 1/5',reportedBy:'رائد الفصل',assignee:'',status:'مفتوح',slaHours:24,dueAt:`${n.date} 23:59`,closedAt:'',closeNote:''}\n  ];\n  store.absences=[\n    {id:'ABS-DEMO-001',date:n.date,teacher:'أحمد محمد',subject:'رياضيات',lessons:4,reason:'غياب',status:'مسجل',note:'',recordedBy:'الوكيل',at:'06:55'},\n    {id:'ABS-DEMO-002',date:n.date,teacher:'سالم علي',subject:'علوم',lessons:3,reason:'مهمة رسمية',status:'مسجل',note:'',recordedBy:'الوكيل',at:'07:02'}\n  ];\n  store.coverage=[\n    {id:'COV-DEMO-001',date:n.date,period:'1',className:'1/2',subject:'رياضيات',absentTeacher:'أحمد محمد',coverTeacher:'خالد عبدالله',status:'مغطاة',note:''},\n    {id:'COV-DEMO-002',date:n.date,period:'2',className:'1/4',subject:'رياضيات',absentTeacher:'أحمد محمد',coverTeacher:'',status:'غير مغطاة',note:''},\n    {id:'COV-DEMO-003',date:n.date,period:'3',className:'2/1',subject:'علوم',absentTeacher:'سالم علي',coverTeacher:'محمد حسن',status:'مغطاة',note:''},\n    {id:'COV-DEMO-004',date:n.date,period:'4',className:'2/5',subject:'علوم',absentTeacher:'سالم علي',coverTeacher:'',status:'غير مغطاة',note:''}\n  ];\n  store.tasks=[\n    {id:'TSK-DEMO-001',createdAt:`${n.date} 07:00`,title:'اعتماد مناوبة نهاية الدوام',description:'مراجعة جدول المناوبة واعتماده.',owner:'وكيل المدرسة',priority:'متوسط',department:'الإدارة',dueDate:n.date,status:'قيد التنفيذ',createdBy:'مدير المدرسة',completedAt:''},\n    {id:'TSK-DEMO-002',createdAt:`${n.date} 07:10`,title:'متابعة البلاغ الصحي',description:'التأكد من معالجة البلاغ قبل الفسحة.',owner:'مسؤول السلامة',priority:'عاجل',department:'السلامة',dueDate:n.date,status:'جديدة',createdBy:'الإدارة',completedAt:''},\n    {id:'TSK-DEMO-003',createdAt:`${n.date} 06:50`,title:'رفع تقرير الانضباط',description:'إقفال تقرير بداية اليوم.',owner:'شؤون الطلاب',priority:'متوسط',department:'شؤون الطلاب',dueDate:n.date,status:'مكتملة',createdBy:'الإدارة',completedAt:`${n.date} 08:15`}\n  ];\n  store.tardies=[\n    {id:'LATE-DEMO-001',date:n.date,student:'طالب تجريبي 1',grade:'الأول متوسط',className:'2',minutes:12,note:'ازدحام',recordedBy:'الإداري',at:'07:12'},\n    {id:'LATE-DEMO-002',date:n.date,student:'طالب تجريبي 2',grade:'الثاني متوسط',className:'4',minutes:18,note:'',recordedBy:'الإداري',at:'07:18'}\n  ];\n  store.events=[\n    {id:'EV1',at:`${n.date} 08:15`,type:'مهمة',ref:'TSK-DEMO-003',description:'تم إكمال مهمة رفع تقرير الانضباط',user:'شؤون الطلاب'},\n    {id:'EV2',at:`${n.date} 08:05`,type:'بلاغ',ref:'INC-DEMO-003',description:'تم تسجيل بلاغ صيانة جديد',user:'رائد الفصل'},\n    {id:'EV3',at:`${n.date} 07:35`,type:'بلاغ',ref:'INC-DEMO-002',description:'تم تسجيل بلاغ تقني في فصل 2/3',user:'معلم'},\n    {id:'EV4',at:`${n.date} 07:02`,type:'غياب',ref:'ABS-DEMO-002',description:'تم تسجيل غياب المعلم سالم علي',user:'الوكيل'}\n  ];\n}\nif(!store.version || body.forceSeed===true) seed();\n\nfunction slaHours(priority){return priority==='حرج'?2:priority==='عاجل'?4:priority==='منخفض'?24:12;}\nfunction computedIncidents(){\n  const nowMs = Date.now();\n  return store.incidents.map(x=>{\n    let slaState='ضمن الوقت';\n    if(x.status!=='مغلق'){\n      const due = new Date(x.dueAt.replace(' ','T')+'+03:00').getTime();\n      if(Number.isFinite(due) && due < nowMs) slaState='متأخر';\n    }\n    return {...x,slaState};\n  }).sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));\n}\nfunction dashboard(){\n  const inc=computedIncidents(), today=riyadhNow().date;\n  const abs=store.absences.filter(x=>x.date===today);\n  const cov=store.coverage.filter(x=>x.date===today);\n  const tard=store.tardies.filter(x=>x.date===today);\n  const tasks=[...store.tasks].sort((a,b)=>String(b.createdAt).localeCompare(String(a.createdAt)));\n  const openInc=inc.filter(x=>x.status!=='مغلق'), critical=openInc.filter(x=>x.priority==='حرج'||x.slaState==='متأخر');\n  const openTasks=tasks.filter(x=>x.status!=='مكتملة'), uncovered=cov.filter(x=>x.status!=='مغطاة');\n  let level='normal',label='طبيعي';\n  if(critical.length>0 || uncovered.length>=3){level='critical';label='يحتاج تدخل عاجل';}\n  else if(openInc.length>=3 || uncovered.length>0 || abs.length>=2 || openTasks.filter(x=>x.priority==='عاجل'||x.priority==='حرج').length>0){level='warning';label='يحتاج متابعة';}\n  const cats={};openInc.forEach(x=>cats[x.category]=(cats[x.category]||0)+1);\n  return {\n    success:true,generatedAt:riyadhNow().iso,dayStatus:{level,label},\n    summary:{openIncidents:openInc.length,criticalIncidents:critical.length,absencesToday:abs.length,uncoveredLessons:uncovered.length,openTasks:openTasks.length,tardiesToday:tard.length},\n    incidentCategories:cats,\n    coverageStats:{total:cov.length,covered:cov.filter(x=>x.status==='مغطاة').length,open:uncovered.length},\n    incidents:inc,absences:abs,coverage:cov,tasks,tardies:tard,recentEvents:store.events.slice(0,15)\n  };\n}\n\nif(key !== API_KEY) return [{json:{success:false,message:'مفتاح SchoolPulse غير صحيح.'}}];\n\nif(action==='ping') return [{json:{success:true,message:'SchoolPulse API is online',serverTime:riyadhNow().iso,storage:'workflow-static-data'}}];\nif(action==='dashboard') return [{json:dashboard()}];\n\nif(action==='createIncident'){\n  const title=String(body.title??'').trim(),description=String(body.description??'').trim(),category=String(body.category??'أخرى').trim(),priority=String(body.priority??'متوسط').trim(),location=String(body.location??'').trim(),assignee=String(body.assignee??'').trim(),reportedBy=String(body.reportedBy??'').trim();\n  if(!title||!location) return [{json:{success:false,message:'عنوان البلاغ والموقع مطلوبان.'}}];\n  const hours=slaHours(priority), id=gen('INC'), createdAt=riyadhNow().iso;\n  const rec={id,createdAt,title,description,category,priority,location,reportedBy,assignee,status:'مفتوح',slaHours:hours,dueAt:addHours(createdAt,hours),closedAt:'',closeNote:''};\n  store.incidents.unshift(rec);event('بلاغ',id,`تم تسجيل بلاغ: ${title}`,reportedBy||'المستخدم');\n  return [{json:{success:true,message:'تم تسجيل البلاغ.',incident:rec}}];\n}\nif(action==='updateIncident'){\n  const id=String(body.id??''),r=store.incidents.find(x=>x.id===id);if(!r)return [{json:{success:false,message:'البلاغ غير موجود.'}}];\n  const old=r.status;r.status=String(body.status??r.status);r.assignee=String(body.assignee??r.assignee);const note=String(body.note??'').trim();\n  if(r.status==='مغلق'&&old!=='مغلق'){r.closedAt=riyadhNow().iso;r.closeNote=note;}\n  event('بلاغ',id,`تحديث البلاغ ${id}: ${r.status}`,String(body.updatedBy??'المستخدم'));\n  return [{json:{success:true,message:'تم تحديث البلاغ.',incident:r}}];\n}\nif(action==='createAbsence'){\n  const teacher=String(body.teacher??'').trim(),subject=String(body.subject??'').trim(),lessons=Math.max(0,Math.min(8,Number(body.lessons??0))),reason=String(body.reason??'غياب'),recordedBy=String(body.recordedBy??'المستخدم'),note=String(body.note??'');\n  if(!teacher)return [{json:{success:false,message:'اسم المعلم مطلوب.'}}];\n  const id=gen('ABS'),rec={id,date:riyadhNow().date,teacher,subject,lessons,reason,status:'مسجل',note,recordedBy,at:riyadhNow().time};store.absences.unshift(rec);\n  for(let i=1;i<=lessons;i++) store.coverage.push({id:gen('COV'),date:riyadhNow().date,period:String(i),className:'يحدد لاحقًا',subject,absentTeacher:teacher,coverTeacher:'',status:'غير مغطاة',note:'أنشئت تلقائيًا من تسجيل الغياب'});\n  event('غياب',id,`تم تسجيل غياب المعلم ${teacher}`,recordedBy);\n  return [{json:{success:true,message:'تم تسجيل الغياب وإنشاء احتياجات التغطية.',absence:rec}}];\n}\nif(action==='createCoverage'){\n  const period=String(body.period??'').trim(),className=String(body.className??'').trim(),subject=String(body.subject??'').trim(),absentTeacher=String(body.absentTeacher??'').trim();\n  if(!period||!className)return [{json:{success:false,message:'الحصة والفصل مطلوبان.'}}];\n  const rec={id:gen('COV'),date:riyadhNow().date,period,className,subject,absentTeacher,coverTeacher:'',status:'غير مغطاة',note:''};store.coverage.push(rec);event('تغطية',rec.id,`تم إنشاء احتياج تغطية للحصة ${period}`,String(body.recordedBy??'المستخدم'));\n  return [{json:{success:true,coverage:rec}}];\n}\nif(action==='updateCoverage'){\n  const r=store.coverage.find(x=>x.id===String(body.id??''));if(!r)return [{json:{success:false,message:'سجل التغطية غير موجود.'}}];\n  r.coverTeacher=String(body.coverTeacher??r.coverTeacher);r.status=String(body.status??r.status);r.note=String(body.note??r.note);event('تغطية',r.id,`تم تحديث تغطية الحصة ${r.period}: ${r.status}`,String(body.updatedBy??'المستخدم'));\n  return [{json:{success:true,message:'تم تحديث التغطية.',coverage:r}}];\n}\nif(action==='createTask'){\n  const title=String(body.title??'').trim(),owner=String(body.owner??'').trim();if(!title||!owner)return [{json:{success:false,message:'عنوان المهمة والمسؤول مطلوبان.'}}];\n  const rec={id:gen('TSK'),createdAt:riyadhNow().iso,title,description:String(body.description??''),owner,priority:String(body.priority??'متوسط'),department:String(body.department??''),dueDate:String(body.dueDate??riyadhNow().date),status:'جديدة',createdBy:String(body.createdBy??'المستخدم'),completedAt:''};\n  store.tasks.unshift(rec);event('مهمة',rec.id,`تم إنشاء مهمة: ${title}`,rec.createdBy);return [{json:{success:true,message:'تم إنشاء المهمة.',task:rec}}];\n}\nif(action==='updateTask'){\n  const r=store.tasks.find(x=>x.id===String(body.id??''));if(!r)return [{json:{success:false,message:'المهمة غير موجودة.'}}];\n  r.status=String(body.status??r.status);if(r.status==='مكتملة'&&!r.completedAt)r.completedAt=riyadhNow().iso;event('مهمة',r.id,`تم تحديث المهمة ${r.title}: ${r.status}`,String(body.updatedBy??'المستخدم'));return [{json:{success:true,message:'تم تحديث المهمة.',task:r}}];\n}\nif(action==='createTardy'){\n  const student=String(body.student??'').trim();if(!student)return [{json:{success:false,message:'اسم الطالب مطلوب.'}}];\n  const rec={id:gen('LATE'),date:riyadhNow().date,student,grade:String(body.grade??''),className:String(body.className??''),minutes:Number(body.minutes??0),note:String(body.note??''),recordedBy:String(body.recordedBy??'المستخدم'),at:riyadhNow().time};\n  store.tardies.unshift(rec);event('تأخر',rec.id,`تم تسجيل تأخر الطالب ${student} (${rec.minutes} دقيقة)`,rec.recordedBy);return [{json:{success:true,message:'تم تسجيل التأخر.',tardy:rec}}];\n}\nif(action==='report'){\n  const d=dashboard(),inc=d.incidents,tasks=d.tasks,cov=d.coverage;\n  const closedInc=inc.filter(x=>x.status==='مغلق').length,completed=tasks.filter(x=>x.status==='مكتملة').length;\n  const rec=[];\n  if(d.summary.uncoveredLessons>0)rec.push(`توجد ${d.summary.uncoveredLessons} حصة غير مغطاة؛ يوصى بإكمال الإسناد قبل الحصة.`);\n  if(d.summary.criticalIncidents>0)rec.push(`يوجد ${d.summary.criticalIncidents} بلاغ حرج أو متأخر عن SLA ويتطلب متابعة فورية.`);\n  if(d.summary.openTasks>3)rec.push('عدد المهام المفتوحة مرتفع؛ يوصى بمراجعة الأولويات والمسؤولين.');\n  if(d.summary.tardiesToday>=5)rec.push('مؤشر التأخر الطلابي مرتفع اليوم؛ يوصى بمتابعة أسباب التأخر المتكررة.');\n  if(!rec.length)rec.push('المؤشرات التشغيلية مستقرة، مع الاستمرار في إغلاق الأعمال المفتوحة بنهاية اليوم.');\n  return [{json:{success:true,date:riyadhNow().date,dayStatus:d.dayStatus,summary:{...d.summary,closedIncidents:closedInc,coveredLessons:d.coverageStats.covered,completedTasks:completed},keyEvents:d.recentEvents.slice(0,10),priorityIncidents:inc.filter(x=>x.status!=='مغلق'&&(x.priority==='حرج'||x.priority==='عاجل'||x.slaState==='متأخر')).slice(0,10),recommendations:rec}}];\n}\nif(action==='resetDemo'){seed();event('النظام','RESET','تمت إعادة بيانات SchoolPulse التجريبية',String(body.staff??'المستخدم'));return [{json:{success:true,message:'تمت إعادة بيانات التجربة.'}}];}\n\nreturn [{json:{success:false,message:'الإجراء المطلوب غير مدعوم.'}}];"
+      },
+      "id": "d0cc548c-97fd-4ff2-bfbf-7db28cafbc7d",
+      "name": "SchoolPulse API Engine",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        820,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {
+          "responseCode": 200,
+          "responseHeaders": {
+            "entries": [
+              {
+                "name": "Access-Control-Allow-Origin",
+                "value": "*"
+              },
+              {
+                "name": "Access-Control-Allow-Methods",
+                "value": "POST, OPTIONS"
+              },
+              {
+                "name": "Access-Control-Allow-Headers",
+                "value": "Content-Type, X-SchoolPulse-Key"
+              },
+              {
+                "name": "Cache-Control",
+                "value": "no-store"
+              }
+            ]
+          }
+        }
+      },
+      "id": "82fce9b2-cf68-48f7-841c-cc4d31880d67",
+      "name": "إرجاع استجابة SchoolPulse",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        1080,
+        400
+      ]
+    },
+    {
+      "parameters": {
+        "content": "# SchoolPulse — غرفة العمليات المدرسية\n\n## مشروع تجريبي مستقل\n- لا يستخدم Google Sheets.\n- لا يستخدم قاعدة بيانات خارجية.\n- يخزن بيانات التجربة داخل Workflow Static Data.\n- Webhook فريد: `schoolpulse-api-v1`.\n- لا يلمس أي Workflow موجود لديك.\n\n## مفتاح التجربة\n`SCHOOLPULSE-DEMO-1448`\n\nلتغييره افتح عقدة `SchoolPulse API Engine` وعدل قيمة `API_KEY`.\n\n## مهم\nفعّل Workflow واستخدم Production Webhook. التخزين الداخلي مصمم لتجارب الـWebhook الفعلية، وليس الاعتماد على Manual Test فقط.\n\nبعد نجاح التجربة يمكن نقل التخزين إلى PostgreSQL/Supabase دون تغيير واجهة الموقع.",
+        "height": 500,
+        "width": 520
+      },
+      "id": "149a2481-135e-4d56-b3b6-75749838bacb",
+      "name": "README داخل Workflow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        500,
+        40
+      ],
+      "notesInFlow": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook - SchoolPulse API": {
+      "main": [
+        [
+          {
+            "node": "SchoolPulse API Engine",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "SchoolPulse API Engine": {
+      "main": [
+        [
+          {
+            "node": "إرجاع استجابة SchoolPulse",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook - CORS": {
+      "main": [
+        [
+          {
+            "node": "رد CORS",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "b87e5d72-4d9c-4436-a303-953939240ee5",
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

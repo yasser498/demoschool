@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#082f3a">
+<title>SchoolPulse | غرفة العمليات المدرسية</title>
+<link rel="stylesheet" href="/assets/app.css?v=1.0.0">
+</head>
+<body>
+
+<div id="loginScreen" class="login">
+ <form id="loginForm" class="login-card">
+  <img class="login-logo" src="/assets/moe-logo.png" alt="وزارة التعليم">
+  <span class="login-tag">SchoolPulse</span>
+  <h1>غرفة العمليات المدرسية</h1>
+  <p>منصة تشغيل يومية للبلاغات والغياب والتغطية والمهام والتقارير.</p>
+  <div class="field"><label>مفتاح النظام</label><input id="loginKey" class="form-control" type="password" required placeholder="أدخل مفتاح SchoolPulse"></div>
+  <div class="field"><label>اسم الموظف</label><input id="loginStaff" class="form-control" required placeholder="مثال: ياسر"></div>
+  <div id="loginMsg" class="alert hidden"></div>
+  <button class="btn btn-primary" style="width:100%;margin-top:15px" type="submit">دخول غرفة العمليات</button>
+  <div class="login-note">للتجربة الأولى: المفتاح الافتراضي موجود في README ويمكن تغييره من Workflow n8n.</div>
+ </form>
+</div>
+
+<div class="app">
+ <aside class="sidebar">
+  <div class="brand"><img src="/assets/moe-logo.png" alt="وزارة التعليم"><div><strong id="sideSchool">المدرسة</strong><small>SchoolPulse · 1448هـ</small></div></div>
+  <div class="side-label">غرفة العمليات</div>
+  <nav id="sideNav" class="nav"></nav>
+  <div class="side-bottom"><small>المستخدم الحالي</small><b id="sideUser">—</b><button id="logoutBtn" class="side-btn">تسجيل الخروج</button></div>
+ </aside>
+
+ <main class="main">
+  <header class="topbar">
+   <div class="top-inner">
+    <div class="top-title"><small>SchoolPulse · التشغيل المدرسي</small><h1 id="topTitle">لوحة اليوم</h1></div>
+    <div class="top-tools"><div id="dayStatus" class="day-status"><span class="day-dot"></span><b id="dayStatusText">جارٍ التقييم</b></div><button id="refreshBtn" class="btn btn-soft">تحديث</button></div>
+   </div>
+  </header>
+
+  <div class="content">
+   <div id="globalMsg" class="alert hidden"></div>
+
+   <section id="dashboardView" class="view active">
+    <div class="page-head"><div><span class="eyebrow">التشغيل اليومي</span><h2>حالة المدرسة اليوم</h2><p>ملخص تنفيذي مباشر للعمليات التي تحتاج انتباه الإدارة.</p></div><div class="toolbar"><button class="btn btn-primary" data-open="incident">＋ بلاغ جديد</button><button class="btn btn-soft" data-open="absence">غياب معلم</button><button class="btn btn-soft" data-open="task">مهمة جديدة</button></div></div>
+    <div id="dashboardKpis" class="kpis"></div>
+    <div class="grid-2">
+     <div>
+      <section class="card"><div class="card-head"><div><h3>توزيع البلاغات المفتوحة</h3><p>حسب نوع البلاغ</p></div><button class="card-link" data-go="incidents">عرض البلاغات</button></div><div class="card-body"><div id="incidentBars" class="bar-list"></div></div></section>
+      <section class="card"><div class="card-head"><div><h3>تغطية الحصص</h3><p>الحصص الناتجة عن غياب المعلمين</p></div><button class="card-link" data-go="absence">إدارة التغطية</button></div><div class="card-body"><div id="coverageSummary" class="priority-strip"></div></div></section>
+     </div>
+     <div>
+      <section class="card"><div class="card-head"><div><h3>آخر الأحداث</h3><p>السجل الزمني لعمليات اليوم</p></div></div><div class="card-body"><div id="timeline" class="timeline"></div></div></section>
+     </div>
+    </div>
+   </section>
+
+   <section id="incidentsView" class="view">
+    <div class="page-head"><div><span class="eyebrow">البلاغات والمرافق</span><h2>مركز البلاغات المدرسية</h2><p>متابعة الصيانة والسلامة والتقنية والمرافق حتى الإغلاق.</p></div><button class="btn btn-primary" data-open="incident">＋ تسجيل بلاغ</button></div>
+    <section class="card"><div class="card-head"><div><h3>البلاغات</h3><p>مع احتساب أولوية البلاغ ووقت SLA.</p></div><div class="filters"><select id="incidentStatusFilter" class="form-control"><option value="الكل">كل الحالات</option><option>مفتوح</option><option>قيد المعالجة</option><option>مغلق</option></select><input id="incidentSearch" class="form-control" placeholder="بحث..."></div></div><div class="table-wrap"><table class="table"><thead><tr><th>البلاغ</th><th>العنوان</th><th>التصنيف</th><th>الأولوية</th><th>الموقع</th><th>المسؤول</th><th>SLA</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="incidentsTable"></tbody></table></div></section>
+   </section>
+
+   <section id="absenceView" class="view">
+    <div class="page-head"><div><span class="eyebrow">الغياب والتغطية</span><h2>غياب المعلمين وتغطية الحصص</h2><p>تسجيل الغياب ثم إسناد الحصص البديلة ومتابعة التغطية.</p></div><div class="toolbar"><button class="btn btn-primary" data-open="absence">＋ تسجيل غياب</button><button class="btn btn-soft" data-open="coverage">＋ تغطية يدوية</button></div></div>
+    <div class="grid-2">
+     <section class="card"><div class="card-head"><div><h3>غياب اليوم</h3><p>المعلمون المسجل غيابهم</p></div></div><div class="table-wrap"><table class="table" style="min-width:650px"><thead><tr><th>المعلم</th><th>التخصص</th><th>الحصص</th><th>السبب</th><th>الحالة</th></tr></thead><tbody id="absenceTable"></tbody></table></div></section>
+     <section class="card"><div class="card-head"><div><h3>مؤشر التغطية</h3><p>نسبة الحصص التي تم تغطيتها</p></div></div><div class="card-body"><div id="coverageIndicator"></div></div></section>
+    </div>
+    <section class="card"><div class="card-head"><div><h3>لوحة تغطية الحصص</h3><p>أسند المعلم البديل وأغلق احتياج التغطية.</p></div></div><div class="card-body"><div id="coverageBoard" class="coverage-board"></div></div></section>
+   </section>
+
+   <section id="tasksView" class="view">
+    <div class="page-head"><div><span class="eyebrow">المهام</span><h2>المهام والتكليفات اليومية</h2><p>تجميع الأعمال المستحقة والمسؤولين والأولوية في مكان واحد.</p></div><button class="btn btn-primary" data-open="task">＋ مهمة جديدة</button></div>
+    <section class="card"><div class="card-head"><div><h3>قائمة المهام</h3><p>يمكن إكمال المهمة مباشرة من اللوحة.</p></div><div class="filters"><select id="taskStatusFilter" class="form-control"><option value="الكل">كل الحالات</option><option>جديدة</option><option>قيد التنفيذ</option><option>مكتملة</option></select></div></div><div class="table-wrap"><table class="table"><thead><tr><th>المهمة</th><th>المسؤول</th><th>الأولوية</th><th>الجهة</th><th>الاستحقاق</th><th>الحالة</th><th>إجراء</th></tr></thead><tbody id="tasksTable"></tbody></table></div></section>
+   </section>
+
+   <section id="tardiesView" class="view">
+    <div class="page-head"><div><span class="eyebrow">الانضباط الصباحي</span><h2>التأخر الطلابي</h2><p>سجل سريع لتأخر الطلاب ومؤشر لحالة بداية اليوم الدراسي.</p></div><button class="btn btn-primary" data-open="tardy">＋ تسجيل تأخر</button></div>
+    <div id="tardyKpis" class="kpis" style="grid-template-columns:repeat(3,1fr)"></div>
+    <section class="card"><div class="card-head"><div><h3>سجل تأخر اليوم</h3></div></div><div class="table-wrap"><table class="table" style="min-width:720px"><thead><tr><th>الطالب</th><th>الصف</th><th>الفصل</th><th>دقائق التأخر</th><th>الملاحظة</th><th>سجل بواسطة</th><th>الوقت</th></tr></thead><tbody id="tardiesTable"></tbody></table></div></section>
+   </section>
+
+   <section id="reportView" class="view">
+    <div class="page-head no-print"><div><span class="eyebrow">التقرير اليومي</span><h2>تقرير غرفة العمليات المدرسية</h2><p>يُنشأ من البيانات الحالية ويمكن طباعته أو حفظه PDF.</p></div><div class="toolbar"><button id="reportRefreshBtn" class="btn btn-soft">تحديث التقرير</button><button id="printReportBtn" class="btn btn-primary">طباعة / حفظ PDF</button></div></div>
+    <article class="report-paper">
+     <header class="report-head"><img src="/assets/moe-logo.png" alt="وزارة التعليم"><div class="report-title"><h2 id="reportSchool">المدرسة</h2><p>تقرير غرفة العمليات المدرسية اليومي</p><b id="reportDate">—</b></div><div class="report-meta"><span>إعداد</span><b id="reportStaff">—</b><span>حالة اليوم</span><b id="reportState">—</b></div></header>
+     <section class="report-section"><h3>الملخص التنفيذي</h3><div id="reportStats" class="report-grid"></div></section>
+     <section class="report-section"><h3>أبرز أحداث اليوم</h3><div id="reportEvents"></div></section>
+     <section class="report-section"><h3>البلاغات المفتوحة ذات الأولوية</h3><div class="table-wrap"><table class="table" style="min-width:650px"><thead><tr><th>البلاغ</th><th>العنوان</th><th>الأولوية</th><th>الموقع</th><th>المسؤول</th><th>الحالة</th></tr></thead><tbody id="reportIncidents"></tbody></table></div></section>
+     <section class="report-section"><h3>ملاحظات تشغيلية مقترحة</h3><div id="reportRecommendations" class="report-note"></div></section>
+     <div class="signatures"><div class="signature">إعداد التقرير<br><b id="reportSign">—</b></div><div class="signature">وكيل المدرسة<br><br>التوقيع</div><div class="signature">مدير المدرسة<br><br>التوقيع</div></div>
+    </article>
+   </section>
+
+   <section id="settingsView" class="view">
+    <div class="page-head"><div><span class="eyebrow">الإعدادات</span><h2>إعدادات SchoolPulse</h2><p>فحص الاتصال وإدارة بيانات التجربة.</p></div><button id="healthBtn" class="btn btn-primary">فحص اتصال n8n</button></div>
+    <div id="settingsMsg" class="alert hidden"></div>
+    <div class="settings-grid">
+     <article class="setting-card"><h3>الاتصال</h3><p>بيانات API المستخدمة بواسطة الموقع.</p><div class="setting-line"><span>Webhook</span><b id="apiUrlDisplay">—</b></div><div class="setting-line"><span>الإصدار</span><b id="versionDisplay">—</b></div><div class="setting-line"><span>حالة الاتصال</span><b id="healthState">غير مفحوص</b></div></article>
+     <article class="setting-card"><h3>بيانات التجربة</h3><p>النسخة تستخدم التخزين الداخلي في Workflow لتكون مستقلة تمامًا.</p><div class="setting-line"><span>نوع التخزين</span><b>Workflow Static Data</b></div><div class="setting-line"><span>قاعدة بيانات خارجية</span><b>غير مطلوبة</b></div><button id="resetDemoBtn" class="btn btn-danger" style="margin-top:10px">إعادة بيانات التجربة</button></article>
+     <article class="setting-card"><h3>السياسة التشغيلية</h3><p>أزمنة SLA الافتراضية للبلاغات.</p><div class="setting-line"><span>حرج</span><b>ساعتان</b></div><div class="setting-line"><span>عاجل</span><b>4 ساعات</b></div><div class="setting-line"><span>متوسط</span><b>12 ساعة</b></div><div class="setting-line"><span>منخفض</span><b>24 ساعة</b></div></article>
+     <article class="setting-card"><h3>تنبيه</h3><p>هذا إصدار تجريبي مستقل. بعد نجاح التجربة يمكن تحويل التخزين إلى PostgreSQL أو Supabase بدون تغيير الواجهة.</p></article>
+    </div>
+   </section>
+  </div>
+ </main>
+</div>
+
+<nav id="mobileNav" class="mobile-nav"></nav>
+
+<div id="formModal" class="modal hidden">
+ <div class="modal-card"><div class="modal-head"><h3 id="modalTitle">إضافة</h3><button id="modalClose" class="modal-close">×</button></div><div id="modalBody" class="modal-body"></div><div id="modalFoot" class="modal-foot"></div></div>
+</div>
+
+<script src="/assets/config.js?v=1.0.0"></script>
+<script src="/assets/app.js?v=1.0.0"></script>
+</body>
+</html>
