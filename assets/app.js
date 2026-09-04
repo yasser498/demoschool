@@ -21,7 +21,7 @@ function go(v,rebuild=true){view=v;all(".view").forEach(x=>x.classList.toggle("a
 async function refresh(){
  try{
   D=await api("dashboard");
-  if(role==="parent"&&(!D||!D.parent||!Array.isArray(D.children))) throw new Error("لم تصل بيانات ولي الأمر بالشكل الصحيح من n8n. تأكد أن Workflow جِسر V0.91 هو المفعّل وحده.");
+  if(role==="parent"&&(!D||!D.parent||!Array.isArray(D.children))) throw new Error("لم تصل بيانات ولي الأمر من n8n. تأكد أن Workflow جِسر V0.92 STABLE هو المفعّل وحده.");
   if(role==="student"&&(!D||!D.student)) throw new Error("لم تصل بيانات الطالب بالشكل الصحيح من n8n.");
   if(role==="admin"&&(!D||!Array.isArray(D.requests)||!D.summary)) throw new Error("لم تصل بيانات لوحة المدرسة بالشكل الصحيح من n8n.");
   $("#unread").textContent=D.unreadCount||0;
